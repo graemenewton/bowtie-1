@@ -1797,11 +1797,17 @@ inline static int pop64(uint64_t x) {
     struct USE_POPCNT_INSTRUCTION {
         inline static int pop64(uint64_t x) {
             int64_t count;
-            asm ("popcntq %[x],%[count]\n": [count] "=&r" (count): [x] "r" (x));
+            #if defined(__x86_64__) || defined(__i386__)
+                asm ("popcntq %[x],%[count]\n": [count] "=&r" (count): [x] "r" (x));
+            #else
+                // Provide a fallback for non-x86 platforms
+                count = __builtin_popcountll(x);
+            #endif
             return count;
         }
     };
 #endif
+
 
 #endif
 
